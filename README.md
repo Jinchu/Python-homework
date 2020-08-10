@@ -2,6 +2,7 @@
 
 ## Structure of this project
 
+```plain-text
 Python-homework <-- Root of the repo
 ├── website_checker <-- Root of the package 0
 |   ├── __init__.py
@@ -14,3 +15,4 @@ Python-homework <-- Root of the repo
 │   └── test_db_writer.py
 │
 └──README.md
+```
