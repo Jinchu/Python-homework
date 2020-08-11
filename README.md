@@ -30,7 +30,7 @@ Python-homework <-- Root of the repo
 │   ├── db_writer.py
 │   └── test_db_writer.py
 │
-├── example_website_checker_config.txt
-├── example_database_writer_config.txt
+├── example_website_checker.conf
+├── example_database_writer.conf
 └── README.md
 ```
