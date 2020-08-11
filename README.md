@@ -1,5 +1,21 @@
 # Python-homework
 
+There are some prerequisites for running this program:
+
+- kafka-python
+- libpq-dev
+- psycopg2
+
+Running the modules requires that you are in the root of this repo:
+
+```bash
+python3 website_checker -c <path to the config>
+```
+
+```bash
+python3 database_writer -c <path to the config>
+```
+
 ## Structure of this project
 
 ```plain-text
@@ -14,6 +30,7 @@ Python-homework <-- Root of the repo
 │   ├── db_writer.py
 │   └── test_db_writer.py
 │
-├── example_config.txt
+├── example_website_checker_config.txt
+├── example_database_writer_config.txt
 └── README.md
 ```
