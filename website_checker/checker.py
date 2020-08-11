@@ -1,6 +1,8 @@
 import time
 import requests
 import re
+from kafka import KafkaProducer
+
 
 class WebsiteChecker(object):
     """ Apache Kafka producer that checks single website status based on configuration. """
@@ -14,6 +16,17 @@ class WebsiteChecker(object):
         """ Outputs message to std.out only if verbose flag is enabled. """
         if self.debug:
             print(msg)
+
+    def setup_kafka_producer(self):
+        producer = KafkaProducer(
+            bootstrap_servers=self.config['Kafka']['server-name'],
+            security_protocol="SSL",
+            ssl_cafile=self.config['Kafka']['ssl_ca_path'],
+            ssl_certfile=self.config['Kafka']['ssl_certfile'],
+            ssl_keyfile=self.config['Kafka']['ssl_keyfile'],
+        )
+
+        return producer
 
     def monitoring_loop(self):
         """ Periodically checks the status of the target site. """
@@ -41,25 +54,39 @@ class WebsiteChecker(object):
             print("%s  is not a valid target" % target)
             return -1
 
+        producer = self.setup_kafka_producer()
+        kafka_topic = self.config['Kafka']['topic']
+
         while True:
             self.debug_print('Running checks...')
             try:
                 response = requests.get(target)
             except requests.exceptions.ConnectionError:
                 self.debug_print('Connection refused')
+
                 if self.testing:
                     return 0
                 time.sleep(int(interval_str))
                 continue
 
-            self.debug_print("Response status: %d" % response.status_code)
-            self.debug_print("response time: %f" % response.elapsed.total_seconds())
+            page_status = 'status:%s' % str(response.status_code)
+            response_time = 'response-time:%s' % str(response.elapsed.total_seconds())
+            self.debug_print(page_status)
+            self.debug_print(response_time)
+            producer.send(kafka_topic, page_status.encode('utf-8'))
+            producer.send(kafka_topic, response_time.encode('utf-8'))
 
             if check_content:
                 self.debug_print("Testing regex against the page HTML")
                 pattern = re.compile(regex)
                 regex_match_count = len(pattern.findall(response.text))
-                self.debug_print(regex_match_count)
+
+                regex_result = 'regex:%s' % str(regex_match_count)
+                self.debug_print(regex_result)
+                producer.send(kafka_topic, regex_result.encode('utf-8'))
+
+            producer.flush()
+
             if self.testing:
                 return 0
             time.sleep(int(interval_str))
