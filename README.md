@@ -14,5 +14,6 @@ Python-homework <-- Root of the repo
 │   ├── db_writer.py
 │   └── test_db_writer.py
 │
-└──README.md
+├── example_config.txt
+└── README.md
 ```
