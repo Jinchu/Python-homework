@@ -41,12 +41,14 @@ class WebsiteChecker(object):
             print("%s  is not a valid target" % target)
             return -1
 
-        while not self.testing:
+        while True:
             self.debug_print('Running checks...')
             try:
                 response = requests.get(target)
             except requests.exceptions.ConnectionError:
                 self.debug_print('Connection refused')
+                if self.testing:
+                    return 0
                 time.sleep(int(interval_str))
                 continue
 
@@ -58,6 +60,6 @@ class WebsiteChecker(object):
                 pattern = re.compile(regex)
                 regex_match_count = len(pattern.findall(response.text))
                 self.debug_print(regex_match_count)
+            if self.testing:
+                return 0
             time.sleep(int(interval_str))
-
-        return 0

@@ -5,14 +5,18 @@ import checker
 
 
 class testResponse():
+    class testElapsed():
+        def total_seconds(self):
+            return 0.242703
+
     def __init__(self, code, time, text):
         self.status_code = code
-        self.time = time
+        self.elapsed = self.testElapsed()
         self.text = text
 
 def build_200_test_response():
     """ Helper to simulate config. """
-    response = testResponse(200, 0.242703, "Test Web Site LOL")
+    response = testResponse(200, '0.242703', "Test Web Site LOL")
     return response
 
 class TestCheckerErrorHandling(unittest.TestCase):
@@ -39,14 +43,14 @@ class TestMonitoringLoop(unittest.TestCase):
     def test_monitoring(self):
         requests.get = MagicMock(return_value=build_200_test_response())
         test_conf = {}
-        test_conf['Website-checker'] = {'target':'http://example.com', 'interval':'1'}
+        test_conf['Website-checker'] = {'target':'http://exampleasdf.com', 'interval':'1'}
         web_check = checker.WebsiteChecker(test_conf, False, testing=True)
         self.assertEqual(web_check.monitoring_loop(), 0)
 
     def test_monitoring_regex(self):
         requests.get = MagicMock(return_value=build_200_test_response())
         test_conf = {}
-        test_conf['Website-checker'] = {'target':'http://example.com', 'interval':'1',
+        test_conf['Website-checker'] = {'target':'http://example.comasdf', 'interval':'1',
                                         'regex':'pattern'}
         web_check = checker.WebsiteChecker(test_conf, False, testing=True)
         self.assertEqual(web_check.monitoring_loop(), 0)
