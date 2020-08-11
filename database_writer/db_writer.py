@@ -1,6 +1,7 @@
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from kafka import KafkaConsumer
+from time import sleep
 
 class DatabaseWriter(object):
     """ Apache Kafka consumer that writes website status to a DB. """
@@ -37,7 +38,12 @@ class DatabaseWriter(object):
         db_uri = self.config['Postgre']['server-uri']
         table = self.config['Postgre']['table-name']
 
-        db_conn = psycopg2.connect(db_uri)
+        try:
+            db_conn = psycopg2.connect(db_uri)
+        except psycopg2.OperationalError:
+            print("Connection problems...")
+            sleep(60)
+            return 2
         cursor = db_conn.cursor(cursor_factory=RealDictCursor)
 
         sqlCreateTable = "CREATE TABLE ExampleMeasurements (id varchar(128), measurement varchar(128));"
